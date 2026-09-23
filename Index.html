@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StarBook - Artigos</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f8ff; }
+        input, textarea { width: 300px; padding: 8px; margin: 5px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        .artigo { border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: white; }
+    </style>
+</head>
+<body>
+    <h1>🌟 StarBook - Artigos de Bem-estar</h1>
+
+    <h2>Cadastrar Novo Artigo</h2>
+    <input type="text" id="titulo" placeholder="Título do artigo"><br>
+    <textarea id="conteudo" placeholder="Conteúdo"></textarea><br>
+    <button onclick="cadastrar()">Cadastrar</button>
+
+    <h2>Artigos Publicados</h2>
+    <div id="lista"></div>
+
+<script>
+const API = "http://localhost:3000"
+  
+function listar() {
+    fetch(API + "/artigos")
+    .then(res => res.json())
+    .then(dados => {
+        let html = "";
+        dados.forEach(a => {
+            html += `<div class="artigo">
+                <h3>${a.titulo}</h3>
+                <p>${a.conteudo}</p>
+                <button onclick="deletar(${a.id})">Excluir</button>
+            </div>`
+        });
+        document.getElementById("lista").innerHTML = html;
+    })
+}
+
+function cadastrar() {
+    const titulo = document.getElementById("titulo").value;
+    const conteudo = document.getElementById("conteudo").value;
+    
+    fetch(API + "/artigos", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({titulo, conteudo})
+    }).then(() => {
+        alert("Artigo cadastrado!");
+        listar();
+    })
+}
+
+function deletar(id) {
+    fetch(API + "/artigos/" + id, { method: "DELETE" })
+    .then(() => {
+        alert("Artigo deletado!");
+        listar();
+    })
+}
+
+// Carrega quando abre
+listar();
+</script>
+</body>
+</html>
