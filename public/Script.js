@@ -16,6 +16,10 @@ if(res.ok){
 }
 }
 
+function sair() {
+    window.location.href = 'index.html';
+}
+
 async function logar() {
   const email = document.getElementById('login-email').value;
   const senha = document.getElementById('login-senha').value;
