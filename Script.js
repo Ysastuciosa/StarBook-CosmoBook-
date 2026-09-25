@@ -9,7 +9,11 @@ async function cadastrar() {
     body: JSON.stringify({ nome, email, senha })
   });
   const data = await res.json();
+if(res.ok){
+  window.location.href = '/menu.html'; // manda pro menu
+} else {
   document.getElementById('mensagem').innerText = data.mensagem;
+}
 }
 
 async function logar() {
