@@ -9,15 +9,13 @@ async function cadastrar() {
     body: JSON.stringify({ nome, email, senha })
   });
   const data = await res.json();
-if(res.ok){
-  window.location.href = '/menu.html'; // manda pro menu
-} else {
-  document.getElementById('mensagem').innerText = data.mensagem;
-}
-}
-
-function sair() {
-    window.location.href = 'index.html';
+  
+  if(res.ok){
+    localStorage.setItem('usuario', JSON.stringify({nome, email}));
+    window.location.href = 'menu.html';
+  } else {
+    document.getElementById('mensagem').innerText = data.mensagem || 'Erro ao cadastrar';
+  }
 }
 
 async function logar() {
@@ -30,5 +28,16 @@ async function logar() {
     body: JSON.stringify({ email, senha })
   });
   const data = await res.json();
-  document.getElementById('mensagem').innerText = data.mensagem;
+
+  if(res.ok){
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+    window.location.href = 'menu.html';
+  } else {
+    document.getElementById('mensagem').innerText = data.mensagem;
+  }
+}
+
+function sair() {
+  localStorage.clear();
+  window.location.href = 'index.html';
 }
