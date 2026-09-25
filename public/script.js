@@ -9,8 +9,15 @@ async function cadastrar() {
     body: JSON.stringify({ nome, email, senha })
   });
   const data = await res.json();
+
   if(res.ok){
-    localStorage.setItem('usuario', JSON.stringify({nome, email}));
+    const loginRes = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+    const loginData = await loginRes.json();
+    localStorage.setItem('usuario', JSON.stringify(loginData.usuario));
     window.location.href = 'menu.html'; 
   } else {
     document.getElementById('mensagem').innerText = data.mensagem;

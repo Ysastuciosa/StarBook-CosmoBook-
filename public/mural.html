@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural de Desabafos - StarBook</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .mural-container { width: 500px; max-width: 90%; }
+        textarea { width: 100%; padding: 12px; border: 1px solid #d8ccf0; border-radius: 8px; background: #faf8ff; resize: none; font-family: Arial; outline: none; }
+        textarea:focus { border-color: #7c4dff; box-shadow: 0 0 0 3px rgba(124,77,255,0.15); }
+        .desabafo-card { background: #faf8ff; border: 1px solid #e9e0ff; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: left; }
+        .desabafo-card p { margin: 0 0 8px 0; }
+        .desabafo-card small { color: #9a8ac0; }
+        .acoes { display: flex; gap: 8px; margin-top: 10px; }
+        .acoes button { width: auto; padding: 6px 12px; font-size: 13px; }
+        .btn-editar { background: white !important; color: #7c4dff !important; border: 1px solid #d8ccf0 !important; }
+        .btn-apagar { background: #ff6b6b !important; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container mural-container">
+        <div class="top-bar">
+            <h2 style="margin:0">💜 Mural</h2>
+            <button onclick="window.location.href='menu.html'" style="width:auto; padding:8px 14px;">Voltar</button>
+        </div>
+
+        <textarea id="texto-desabafo" rows="4" placeholder="Como você está se sentindo hoje? Escreva aqui..."></textarea>
+        <div style="display:flex; align-items:center; gap:8px; margin: 10px 0;">
+            <input type="checkbox" id="anonimo" style="width:auto;">
+            <label for="anonimo" style="font-size:14px; color:#6b5b95;">Postar como anônimo</label>
+        </div>
+        <button id="btn-postar" onclick="criarDesabafo()">Postar Desabafo</button>
+
+        <div id="lista-desabafos"></div>
+    </div>
+
+<script>
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if(!usuario) window.location.href = 'index.html';
+
+    let editandoId = null;
+
+    async function carregarDesabafos(){
+        const res = await fetch('/desabafos');
+        const desabafos = await res.json();
+        const lista = document.getElementById('lista-desabafos');
+        lista.innerHTML = '';
+
+        desabafos.forEach(d => {
+            const nome = d.anonimo ? 'Anônimo 🌟' : d.nome;
+            const ehMeu = d.usuario_id === usuario.id;
+            lista.innerHTML += `
+            <div class="desabafo-card">
+                <p><strong>${nome}</strong></p>
+                <p>${d.texto}</p>
+                <small>${new Date(d.data_criacao).toLocaleString('pt-BR')}</small>
+                ${ehMeu ? `
+                <div class="acoes">
+                    <button class="btn-editar" onclick="prepararEdicao(${d.id}, \`${d.texto.replace(/`/g, "'")}\`)">Editar</button>
+                    <button class="btn-apagar" onclick="apagarDesabafo(${d.id})">Apagar</button>
+                </div>` : ''}
+            </div>`;
+        });
+    }
+
+    async function criarDesabafo(){
+        const texto = document.getElementById('texto-desabafo').value;
+        const anonimo = document.getElementById('anonimo').checked;
+        if(!texto.trim()) return alert('Escreva algo!');
+
+        if(editandoId){
+            
+            await fetch(`/desabafos/${editandoId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ texto })
+            });
+            editandoId = null;
+            document.getElementById('btn-postar').innerText = 'Postar Desabafo';
+        } else {
+            
+            await fetch('/desabafos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ usuario_id: usuario.id, texto, anonimo })
+            });
+        }
+        document.getElementById('texto-desabafo').value = '';
+        document.getElementById('anonimo').checked = false;
+        carregarDesabafos();
+    }
+
+    function prepararEdicao(id, textoAntigo){
+        editandoId = id;
+        document.getElementById('texto-desabafo').value = textoAntigo;
+        document.getElementById('btn-postar').innerText = 'Salvar Edição';
+        window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    async function apagarDesabafo(id){
+        if(!confirm('Tem certeza que quer apagar?')) return;
+        await fetch(`/desabafos/${id}`, { method: 'DELETE' });
+        carregarDesabafos();
+    }
+
+    carregarDesabafos();
+</script>
+</body>
+</html>

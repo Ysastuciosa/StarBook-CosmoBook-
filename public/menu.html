@@ -2,14 +2,22 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Menu Principal</title>
-    <link rel="stylesheet" href="Style.css">
+    <title>Menu Principal - StarBook</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Bem-vindo ao Menu</h1>
-    
-    <button onclick="sair()">Sair</button> 
-
-    <script src="Script.js"></script>
+    <div class="container" style="text-align:center">
+        <h1>Bem-vindo ao StarBook 🌟</h1>
+        <p id="boas-vindas"></p>
+        <button onclick="window.location.href='biblioteca.html'" style="margin-bottom:10px">📚 Biblioteca</button>
+        <button onclick="window.location.href='mural.html'" style="margin-bottom:10px; background:white; color:#7c4dff; border:1px solid #d8ccf0">💜 Mural de Desabafos</button>
+        <button onclick="sair()">Sair</button> 
+    </div>
+    <script src="script.js"></script>
+    <script>
+      const user = JSON.parse(localStorage.getItem('usuario'));
+      if(!user) window.location.href = 'index.html';
+      else document.getElementById('boas-vindas').innerText = `Olá, ${user.nome}!`;
+    </script>
 </body>
 </html>
