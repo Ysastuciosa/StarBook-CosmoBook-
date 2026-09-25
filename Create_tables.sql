@@ -8,3 +8,12 @@ CREATE TABLE usuarios (
   senha VARCHAR(255) NOT NULL,
   data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS desabafos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT,
+  texto TEXT NOT NULL,
+  anonimo BOOLEAN DEFAULT false,
+  data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
