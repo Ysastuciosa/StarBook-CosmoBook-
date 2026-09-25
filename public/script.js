@@ -9,12 +9,11 @@ async function cadastrar() {
     body: JSON.stringify({ nome, email, senha })
   });
   const data = await res.json();
-  
   if(res.ok){
     localStorage.setItem('usuario', JSON.stringify({nome, email}));
-    window.location.href = 'menu.html';
+    window.location.href = 'menu.html'; 
   } else {
-    document.getElementById('mensagem').innerText = data.mensagem || 'Erro ao cadastrar';
+    document.getElementById('mensagem').innerText = data.mensagem;
   }
 }
 
@@ -28,7 +27,6 @@ async function logar() {
     body: JSON.stringify({ email, senha })
   });
   const data = await res.json();
-
   if(res.ok){
     localStorage.setItem('usuario', JSON.stringify(data.usuario));
     window.location.href = 'menu.html';
@@ -37,7 +35,7 @@ async function logar() {
   }
 }
 
-function sair() {
+function sair(){
   localStorage.clear();
   window.location.href = 'index.html';
 }
